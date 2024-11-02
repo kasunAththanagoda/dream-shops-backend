@@ -1,14 +1,15 @@
 package com.ecommerce.dreamshops.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.sql.Blob;
 
-@Entity
-@Data
+@Getter
+@Setter
+@AllArgsConstructor
 @NoArgsConstructor
+@Entity
 public class Image {
 
     @Id
