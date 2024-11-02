@@ -64,10 +64,10 @@ public class ProductService implements IProductService {
     @Override
     public void deleteProductById(Long id) {
         productRepository.findById(id).ifPresentOrElse(
-                productRepository :: delete,
+                productRepository :: delete, // this is equivalent to the lambda expressions product -> productRepository.delete(product)
                 ()-> {
                     throw new ProductNotFoundException("Product with ID " + id + " not found");
-                });  // this is equivalent to the lambda expressions product -> productRepository.delete(product)
+                });
     }
 
     @Override
