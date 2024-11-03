@@ -1,6 +1,7 @@
 package com.ecommerce.dreamshops.service.product;
 
-import com.ecommerce.dreamshops.exceptions.ProductNotFoundException;
+import com.ecommerce.dreamshops.exceptions.ResourceNotFoundException;
+import com.ecommerce.dreamshops.exceptions.ResourceNotFoundException;
 import com.ecommerce.dreamshops.model.Category;
 import com.ecommerce.dreamshops.model.Product;
 import com.ecommerce.dreamshops.repository.CategoryRepository;
@@ -54,11 +55,11 @@ public class ProductService implements IProductService {
     public Product getProductById(Long id) {
 //        Optional<Product> product = productRepository.findById(id);
 //        if (product.isEmpty()) {
-//            throw new ProductNotFoundException("Product with ID " + id + " not found.");
+//            throw new ResourceNotFoundException("Product with ID " + id + " not found.");
 //        }
 
         return productRepository.findById(id)
-                .orElseThrow(() -> new ProductNotFoundException("Product with ID " + id + " not found"));
+                .orElseThrow(() -> new ResourceNotFoundException("Product with ID " + id + " not found"));
     }
 
     @Override
@@ -66,7 +67,7 @@ public class ProductService implements IProductService {
         productRepository.findById(id).ifPresentOrElse(
                 productRepository :: delete, // this is equivalent to the lambda expressions product -> productRepository.delete(product)
                 ()-> {
-                    throw new ProductNotFoundException("Product with ID " + id + " not found");
+                    throw new ResourceNotFoundException("Product with ID " + id + " not found");
                 });
     }
 
@@ -75,7 +76,7 @@ public class ProductService implements IProductService {
         return productRepository.findById(productId)
                 .map(existingProduct -> updateExistingProduct(existingProduct,request))  //The map method on an Optional object is used to apply a function to the value inside the Optional if it is present, and then it returns a new Optional containing the result of that function. If the Optional is empty (i.e., Optional.empty()), map simply returns an empty Optional.
                 .map(productRepository :: save)
-                .orElseThrow(()->new ProductNotFoundException("Product not found"));
+                .orElseThrow(()->new ResourceNotFoundException("Product not found"));
     }
 
     private Product updateExistingProduct(Product existingProduct, ProductUpdateRequest request) {
