@@ -18,7 +18,7 @@ public class Category {
     private String name;
 
 
-    @JsonIgnore
+    @JsonIgnore  //this is important (to stop circular reference )// since when if this is not included, there will be a loop where product > category > product ..
     @OneToMany(mappedBy = "category")
     private List<Product> products;
 
