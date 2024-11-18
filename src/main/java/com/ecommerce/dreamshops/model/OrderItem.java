@@ -1,34 +1,38 @@
 package com.ecommerce.dreamshops.model;
 
 
-import com.ecommerce.dreamshops.enums.OrderStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.HashSet;
-import java.util.Set;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "orders")
 public class OrderItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long orderId;
-    private LocalDate orderDate;
-    private BigDecimal totalAmount;
-    @Enumerated(EnumType.STRING)
-    private OrderStatus orderStatus;
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<OrderItem> orderItems = new HashSet<>();
+    private Long id;
+    private int quantity;
+    private BigDecimal price;
 
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
+
+    @ManyToOne
+    @JoinColumn(name = "order_id")
+    private Order order;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    public OrderItem(Order order, Product product, int quantity, BigDecimal price) {
+        this.order = order;
+        this.product = product;
+        this.quantity = quantity;
+        this.price = price;
+
+    }
 }
