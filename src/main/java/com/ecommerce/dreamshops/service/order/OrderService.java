@@ -1,5 +1,6 @@
 package com.ecommerce.dreamshops.service.order;
 
+import com.ecommerce.dreamshops.dto.OrderDto;
 import com.ecommerce.dreamshops.enums.OrderStatus;
 import com.ecommerce.dreamshops.exceptions.ResourceNotFoundException;
 import com.ecommerce.dreamshops.model.Cart;
@@ -11,7 +12,7 @@ import com.ecommerce.dreamshops.repository.ProductRepository;
 import com.ecommerce.dreamshops.service.cart.CartService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.crossstore.ChangeSetPersister;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,23 +27,23 @@ public class OrderService implements IOrderService {
     private final OrderRepository orderRepository;
     private final CartService cartService;
     private final ProductRepository productRepository;
+    private final ModelMapper modelMapper;
 
     @Transactional
     @Override
     public Order placeOrder(Long userId) {
-//        Cart cart   = cartService.getCartByUserId(userId);
-//        Order order = createOrder(cart);
-//        List<OrderItem> orderItemList = createOrderItems(order, cart);
-//        order.setOrderItems(new HashSet<>(orderItemList));
-//        order.setTotalAmount(calculateTotalAmount(orderItemList));
-//        Order savedOrder = orderRepository.save(order);
-//        cartService.clearCart(cart.getId());
-//        return savedOrder;
-        return null;
+        Cart cart   = cartService.getCartByUserId(userId);
+        Order order = createOrder(cart);
+        List<OrderItem> orderItemList = createOrderItems(order, cart);
+        order.setOrderItems(new HashSet<>(orderItemList));
+        order.setTotalAmount(calculateTotalAmount(orderItemList));
+        Order savedOrder = orderRepository.save(order);
+        cartService.clearCart(cart.getId());
+        return savedOrder;
     }
     private Order createOrder(Cart cart) {
         Order order = new Order();
-//        order.setUser(cart.getUser());
+        order.setUser(cart.getUser());
         order.setOrderStatus(OrderStatus.PENDING);
         order.setOrderDate(LocalDate.now());
         return  order;
@@ -69,9 +70,25 @@ public class OrderService implements IOrderService {
     }
 
     @Override
-    public Order getOrder(Long orderId) {
-        return orderRepository.findById(orderId).orElseThrow(
-                () -> new ResourceNotFoundException("Order not found")
-        );
+    public OrderDto getOrder(Long orderId) {
+        return orderRepository.findById(orderId)
+                .map(this :: convertToDto)
+                .orElseThrow(() -> new ResourceNotFoundException("Order not found"));
+    }
+
+    @Override
+    public List<OrderDto> getUserOrders(Long userId) {
+        List<Order> orders = orderRepository.findByUserId(userId);
+        return  orders.stream().map(this :: convertToDto).toList();
+    }
+
+//    public List<Order> getUserOrders(Long userId) {
+//        List<Order> orders = orderRepository.findByUserId(userId);
+//        return  orders.stream().map(this :: convertToDto).toList();
+//    }
+
+    @Override
+    public OrderDto convertToDto(Order order) {
+        return modelMapper.map(order, OrderDto.class);
     }
 }
