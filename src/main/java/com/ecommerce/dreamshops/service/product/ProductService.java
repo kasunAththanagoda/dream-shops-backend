@@ -2,6 +2,7 @@ package com.ecommerce.dreamshops.service.product;
 
 import com.ecommerce.dreamshops.dto.ImageDto;
 import com.ecommerce.dreamshops.dto.ProductDto;
+import com.ecommerce.dreamshops.exceptions.AlreadyExistsException;
 import com.ecommerce.dreamshops.exceptions.ResourceNotFoundException;
 import com.ecommerce.dreamshops.model.Category;
 import com.ecommerce.dreamshops.model.Image;
@@ -35,6 +36,10 @@ public class ProductService implements IProductService {
         // If No, the save it as a new category
         // The set as the new product category.
 
+        if(productExists(request.getName(),request.getBrand())){
+            throw new AlreadyExistsException(request.getBrand()+ " "+ request.getName()+" already exists. you may update instead");
+        }
+
         Category category = Optional.ofNullable(categoryRepository.findByName(request.getCategory().getName())) //Optional.ofNullable: Wraps the result of categoryRepository.findByName(...) in an Optional. If the category is found, it’s wrapped in a non-empty Optional. If not, Optional.empty() is returned.
                 .orElseGet(() -> { //orElseGet: If the category is not found, orElseGet executes the lambda function to create and save a new Category object.
                     Category newCategory = new Category(request.getCategory().getName());
@@ -42,6 +47,10 @@ public class ProductService implements IProductService {
                 });
         request.setCategory(category);
         return productRepository.save(createProduct(request, category));
+    }
+
+    private boolean productExists(String name, String brand) {
+        return productRepository.existsByNameAndBrand(name,brand);
     }
 
     private Product createProduct(AddProductRequest request, Category category) {
