@@ -26,14 +26,9 @@ public class Cart {
     @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CartItem> items = new HashSet<>(); //appropriate when you want to avoid duplicate CartItem entries, which can happen if you accidentally add the same product multiple times without updating the quantity.
 
-//    @OneToOne
-//    @JoinColumn(name = "user_id")
-//    private User user;
-
-
-
-
-
+    @OneToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     public void addItem(CartItem item) {
         this.items.add(item);
