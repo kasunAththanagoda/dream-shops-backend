@@ -1,4 +1,4 @@
-package com.ecommerce.dreamshops.config;
+package com.ecommerce.dreamshops.security.config;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;
